@@ -1,4 +1,5 @@
 package com.kh.jpatotalapp.dto;
+
 import lombok.Getter;
 import lombok.Setter;
 

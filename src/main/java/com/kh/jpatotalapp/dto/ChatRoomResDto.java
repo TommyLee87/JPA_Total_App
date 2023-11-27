@@ -1,6 +1,5 @@
 package com.kh.jpatotalapp.dto;
 
-import com.kh.jpatotalapp.service.ChatService;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,9 +18,8 @@ public class ChatRoomResDto {
     private String name;
     private LocalDateTime regDate;
 
-    @JsonIgnore // WebSocketSession의 직렬화를 방지
+    @JsonIgnore // 이 어노테이션으로 WebSocketSession의 직렬화를 방지
     private Set<WebSocketSession> sessions;
-
     // 세션 수가 0인지 확인하는 메서드
     public boolean isSessionEmpty() {
         return this.sessions.size() == 0;

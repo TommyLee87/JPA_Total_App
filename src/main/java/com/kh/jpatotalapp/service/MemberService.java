@@ -24,6 +24,12 @@ public class MemberService {
         return memberRepository.existsByEmail(email);
     }
 
+    // 회원 상세 조회
+    public MemberDto getMemberDetail(String email) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
+        return convertEntityToDto(member);
+    }
+
     // 회원 가입
     public boolean saveMember(MemberDto memberDto) {
         Member member = new Member();
@@ -35,24 +41,22 @@ public class MemberService {
         memberRepository.save(member);
         return true;
     }
-
     // 회원 수정
     public boolean modifyMember(MemberDto memberDto) {
         try {
-            Member member = memberRepository.findByEmail(memberDto.getEmail()).orElseThrow(
-                    () -> new RuntimeException("해당 회원이 존재하지 않습니다.")
-            );
+            Member member = memberRepository.findByEmail(memberDto.getEmail())
+                    .orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
             member.setName(memberDto.getName());
             member.setImage(memberDto.getImage());
             memberRepository.save(member);
             return true;
-        } catch (Exception e) {
+        }catch(Exception e) {
             e.printStackTrace();
             return false;
         }
     }
 
-    // 로그인
+    //로그인
     public boolean login(String email, String pwd) {
         log.info("email: {}, pwd: {}", email, pwd);
         Optional<Member> member = memberRepository.findByEmailAndPassword(email, pwd);
@@ -60,37 +64,26 @@ public class MemberService {
         return member.isPresent();
     }
 
-    // 회원 삭제
+    // 회원삭제
     public boolean deleteMember(String email) {
         try {
-            Member member = memberRepository.findByEmail(email).orElseThrow(
-                    () -> new RuntimeException("해당 회원이 존재하지 않습니다.")
-            );
+            Member member = memberRepository.findByEmail(email).orElseThrow(()-> new RuntimeException("해당 회원이 존재하지 않습니다."));
             memberRepository.delete(member);
-            return true; // 회원이 존재하면 true 반환
-        } catch (RuntimeException e) {
-            return false; // 회원이 존재하지 않으면 false 반환
+            return true;
+        }catch (Exception e) {
+            return false;
         }
     }
 
-    // 회원 전체 조회
+    //회원 전체 조회
     public List<MemberDto> getMemberList() {
         List<Member> members = memberRepository.findAll();
         List<MemberDto> memberDtos = new ArrayList<>();
-        for (Member member : members) {
+        for(Member member : members) {
             memberDtos.add(convertEntityToDto(member));
         }
         return memberDtos;
     }
-
-    // 회원 상세 조회
-    public MemberDto getMemberDetail(String email) {
-        Member member = memberRepository.findByEmail(email).orElseThrow(
-                () -> new RuntimeException("해당 회원이 존재하지 않습니다.")
-        );
-        return convertEntityToDto(member);
-    }
-
 
     // 총 페이지 수
     public int getMemberPage(Pageable pageable) {
@@ -101,12 +94,13 @@ public class MemberService {
     public List<MemberDto> getMemberList(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         List<Member> members = memberRepository.findAll(pageable).getContent();
-        List<MemberDto> memberDtos = new ArrayList<>();
-        for (Member member : members) {
+        List<MemberDto>memberDtos = new ArrayList<>();
+        for(Member member : members) {
             memberDtos.add(convertEntityToDto(member));
         }
         return memberDtos;
     }
+
 
     // 회원 엔티티를 회원 DTO로 변환
     private MemberDto convertEntityToDto(Member member) {

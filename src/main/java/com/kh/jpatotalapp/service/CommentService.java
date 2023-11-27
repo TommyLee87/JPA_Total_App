@@ -1,7 +1,6 @@
 package com.kh.jpatotalapp.service;
 
 import com.kh.jpatotalapp.dto.CommentDto;
-import com.kh.jpatotalapp.dto.MemberDto;
 import com.kh.jpatotalapp.entity.Board;
 import com.kh.jpatotalapp.entity.Comment;
 import com.kh.jpatotalapp.entity.Member;
@@ -9,6 +8,8 @@ import com.kh.jpatotalapp.repository.BoardRepository;
 import com.kh.jpatotalapp.repository.CommentRepository;
 import com.kh.jpatotalapp.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,36 +21,32 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
-    // 댓글 등록
+
+    //댓글 등록
     public boolean commentRegister(CommentDto commentDto) {
-        try {
+        try{
             Comment comment = new Comment();
-            Board board = boardRepository.findById(commentDto.getBoardId()).orElseThrow(
-                    () -> new RuntimeException("해당 게시글이 존재하지 않습니다.")
-            );
-            Member member = memberRepository.findByEmail(commentDto.getEmail()).orElseThrow(
-                    () -> new RuntimeException("해당 회원이 존재하지 않습니다.")
-            );
+            Board board = boardRepository.findById(commentDto.getBoardId()).orElseThrow(() -> new RuntimeException("해당 게시글이 존재하지 않습니다."));
+            Member member = memberRepository.findByEmail(commentDto.getEmail()).orElseThrow(()-> new RuntimeException("해당 회원이 존재하지 않습니다."));
             comment.setContent(commentDto.getContent());
             comment.setMember(member);
             comment.setBoard(board);
             commentRepository.save(comment);
             return true;
-        } catch (Exception e) {
+        }catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
-    // 댓글 수정
-    public boolean commentModify(CommentDto commentDto) {
+
+    //댓글 수정
+    public boolean commentModify(CommentDto commentDto){
         try {
-            Comment comment = commentRepository.findById(commentDto.getCommentId()).orElseThrow(
-                    () -> new RuntimeException("해당 댓글이 존재하지 않습니다.")
-            );
+            Comment comment = commentRepository.findById(commentDto.getCommentId()).orElseThrow(()-> new RuntimeException("해당 댓글이 존재하지 않습니다."));
             comment.setContent(commentDto.getContent());
             commentRepository.save(comment);
             return true;
-        } catch (Exception e) {
+        }catch (Exception e) {
             e.printStackTrace();
             return false;
         }
@@ -57,25 +54,22 @@ public class CommentService {
     // 댓글 삭제
     public boolean commentDelete(Long commentId) {
         try {
-            Comment comment = commentRepository.findById(commentId).orElseThrow(
-                    () -> new RuntimeException("해당 댓글이 존재하지 않습니다.")
-            );
+            Comment comment = commentRepository.findById(commentId).orElseThrow(()-> new RuntimeException("해당 댓글이 존재 하지 않습니다."));
             commentRepository.delete(comment);
             return true;
-        } catch (Exception e) {
+        }catch (Exception e){
             e.printStackTrace();
             return false;
         }
     }
+
     // 댓글 목록 조회
     public List<CommentDto> getCommentList(Long boardId) {
         try {
-            Board board = boardRepository.findById(boardId).orElseThrow(
-                    () -> new RuntimeException("해당 게시글이 존재하지 않습니다.")
-            );
+            Board board = boardRepository.findById(boardId).orElseThrow(()-> new RuntimeException("해당 게시글이 존재하지 않습니다."));
             List<Comment> comments = commentRepository.findByBoard(board);
             List<CommentDto> commentDtos = new ArrayList<>();
-            for (Comment comment : comments) {
+            for(Comment comment : comments) {
                 commentDtos.add(convertEntityToDto(comment));
             }
             return commentDtos;
@@ -86,12 +80,28 @@ public class CommentService {
     }
 
     // 댓글 목록 페이징
+    public List<CommentDto> getCommentList(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        List<Comment> comments = commentRepository.findAll(pageable).getContent();
+        List<CommentDto> commentDtos = new ArrayList<>();
+        for(Comment comment : comments) {
+            commentDtos.add(convertEntityToDto(comment));
+        }
+        return commentDtos;
+    }
+
+    // 페이지 수 조회
+    public int getComments(Pageable pageable) {
+        return commentRepository.findAll(pageable).getTotalPages();
+    }
 
     // 댓글 상세
+    public CommentDto getCommentDetail(Long id) {
+        Comment comment = commentRepository.findById(id).orElseThrow(() -> new RuntimeException("존재 하지 않는 댓글 입니다."));
+        return convertEntityToDto(comment);
+    }
 
-
-
-    // 댓글 검색
+    //댓글 검색
     public List<CommentDto> getCommentList(String keyword) {
         List<Comment> comments = commentRepository.findByContentContaining(keyword);
         List<CommentDto> commentDtos = new ArrayList<>();
@@ -111,8 +121,4 @@ public class CommentService {
         commentDto.setRegDate(comment.getRegDate());
         return commentDto;
     }
-
-
-
-
 }

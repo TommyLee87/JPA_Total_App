@@ -3,6 +3,10 @@ package com.kh.jpatotalapp.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kh.jpatotalapp.dto.ChatMessageDto;
 import com.kh.jpatotalapp.dto.ChatRoomResDto;
+import com.kh.jpatotalapp.entity.Chat;
+import com.kh.jpatotalapp.entity.ChatRoom;
+import com.kh.jpatotalapp.repository.ChatRepository;
+import com.kh.jpatotalapp.repository.ChatRoomRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,6 +23,8 @@ import java.util.*;
 @Service
 public class ChatService {
     private final ObjectMapper objectMapper;
+    private final ChatRepository chatRepository;
+    private final ChatRoomRepository chatRoomRepository;
     private Map<String, ChatRoomResDto> chatRooms;
 
     @PostConstruct // 의존성 주입 이후 초기화를 수행하는 메소드
@@ -43,6 +49,13 @@ public class ChatService {
                 .build();
         chatRooms.put(randomId, chatRoom);
 
+        // DB에 새로운 채팅방 저장
+        ChatRoom newChatRoom = new ChatRoom();
+        newChatRoom.setRoomId(chatRoom.getRoomId());
+        newChatRoom.setRoomName(chatRoom.getName());
+        newChatRoom.setCreatedAt(chatRoom.getRegDate());
+        chatRoomRepository.save(newChatRoom);
+
         return chatRoom;
     }
     public void removeRoom(String roomId) {
@@ -50,6 +63,8 @@ public class ChatService {
         if (room != null) {
             if (room.isSessionEmpty()) {
                 chatRooms.remove(roomId);
+                // DB에서 채팅방 삭제
+                chatRoomRepository.deleteById(roomId);
             }
         }
     }
@@ -59,8 +74,9 @@ public class ChatService {
         if (room != null) {
             room.getSessions().add(session);
             if (chatMessage.getSender() != null) {
-                chatMessage.setMessage(chatMessage.getSender() + "님이 입장했습니다.");
+                chatMessage.setMessage(chatMessage.getSenderName() + "님이 입장했습니다.");
                 sendMessageToAll(roomId, chatMessage);
+
             }
             log.debug("New session added: " + session);
         }
@@ -71,7 +87,7 @@ public class ChatService {
         if (room != null) {
             room.getSessions().remove(session);
             if (chatMessage.getSender() != null) {
-                chatMessage.setMessage(chatMessage.getSender() + "님이 퇴장했습니다.");
+                chatMessage.setMessage(chatMessage.getSenderName() + "님이 퇴장했습니다.");
                 sendMessageToAll(roomId, chatMessage);
             }
             log.debug("Session removed: " + session);
@@ -87,7 +103,9 @@ public class ChatService {
             for (WebSocketSession session : room.getSessions()) {
                 sendMessage(session, message);
             }
+            saveMessage(roomId, message);
         }
+
     }
 
     public <T> void sendMessage(WebSocketSession session, T message) {
@@ -96,5 +114,22 @@ public class ChatService {
         } catch(IOException e) {
             log.error(e.getMessage(), e);
         }
+    }
+
+    // 채팅 메세지 DB저장
+    public void saveMessage(String roomId, ChatMessageDto chatMessageDto) {
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new RuntimeException("해당 채팅방이 존재하지 않습니다."));
+        Chat chatMessage = new Chat();
+        chatMessage.setChatRoom(chatRoom);
+        chatMessage.setSender(chatMessageDto.getSender());
+        chatMessage.setMessage(chatMessageDto.getMessage());
+        chatMessage.setSentAt(LocalDateTime.now());
+        chatMessage.setSenderName(chatMessageDto.getSenderName());
+        chatRepository.save(chatMessage);
+    }
+    // 이전 채팅 가져오기
+    public List<Chat> getRecentMessages(String roomId) {
+        return chatRepository.findRecentMessages(roomId);
     }
 }

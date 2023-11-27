@@ -19,7 +19,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 @Component
 public class WebSocketHandler extends TextWebSocketHandler {
-
     private final ObjectMapper objectMapper;
     private final ChatService chatService;
     private final Map<WebSocketSession, String> sessionRoomIdMap = new ConcurrentHashMap<>();
@@ -27,13 +26,14 @@ public class WebSocketHandler extends TextWebSocketHandler {
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String payload = message.getPayload();
         log.warn("{}", payload);
+        // objecMapper가 json데이터를 객체로 바꿔줌
         ChatMessageDto chatMessage = objectMapper.readValue(payload, ChatMessageDto.class);
         String roomId = chatMessage.getRoomId();
         // 세션과 채팅방 ID를 매핑
         sessionRoomIdMap.put(session, chatMessage.getRoomId());
-        if (chatMessage.getMessageType() == ChatMessageDto.MessageType.ENTER) {
+        if (chatMessage.getType() == ChatMessageDto.MessageType.ENTER) {
             chatService.addSessionAndHandleEnter(roomId, session, chatMessage);
-        } else if (chatMessage.getMessageType() == ChatMessageDto.MessageType.CLOSE) {
+        } else if (chatMessage.getType() == ChatMessageDto.MessageType.CLOSE) {
             chatService.removeSessionAndHandleExit(roomId, session, chatMessage);
         } else {
             chatService.sendMessageToAll(roomId, chatMessage);
@@ -46,7 +46,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
         String roomId = sessionRoomIdMap.remove(session);
         if (roomId != null) {
             ChatMessageDto chatMessage = new ChatMessageDto();
-            chatMessage.setMessageType(ChatMessageDto.MessageType.CLOSE);
+            chatMessage.setType(ChatMessageDto.MessageType.CLOSE);
             chatService.removeSessionAndHandleExit(roomId, session, chatMessage);
         }
     }

@@ -6,7 +6,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
+
 import static com.kh.jpatotalapp.utils.Common.CORS_ORIGIN;
 
 @Slf4j
@@ -16,15 +18,15 @@ import static com.kh.jpatotalapp.utils.Common.CORS_ORIGIN;
 @RequiredArgsConstructor
 public class CategoryController {
     private final CategoryService categoryService;
-    // 카테고리 등록
+    //카테고리 등록
     @PostMapping("/new")
     public ResponseEntity<Boolean> categoryRegister(@RequestBody CategoryDto categoryDto) {
         boolean isTrue = categoryService.saveCategory(categoryDto);
         return ResponseEntity.ok(true);
     }
-    // 카테고리 수정
+    //카테고리 수정
     @PutMapping("/modify/{id}")
-    public ResponseEntity<Boolean> categoryModify(@PathVariable Long id, @RequestBody CategoryDto categoryDto) {
+    public ResponseEntity<Boolean> categoryModify(@PathVariable Long id, @RequestBody CategoryDto categoryDto){
         boolean isTrue = categoryService.modifyCategory(id, categoryDto);
         return ResponseEntity.ok(true);
     }

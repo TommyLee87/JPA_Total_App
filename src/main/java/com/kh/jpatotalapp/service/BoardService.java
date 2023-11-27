@@ -1,4 +1,5 @@
 package com.kh.jpatotalapp.service;
+
 import com.kh.jpatotalapp.dto.BoardDto;
 import com.kh.jpatotalapp.entity.Board;
 import com.kh.jpatotalapp.entity.Category;
@@ -24,12 +25,8 @@ public class BoardService {
     public boolean saveBoard(BoardDto boardDto) {
         try {
             Board board = new Board();
-            Member member = memberRepository.findByEmail(boardDto.getEmail()).orElseThrow(
-                    () -> new RuntimeException("해당 회원이 존재하지 않습니다.")
-            );
-            Category category = categoryRepository.findById(boardDto.getCategoryId()).orElseThrow(
-                    () -> new RuntimeException("해당 카테고리가 존재하지 않습니다.")
-            );
+            Member member = memberRepository.findByEmail(boardDto.getEmail()).orElseThrow(()-> new RuntimeException("해당 회원이 존재 하지 않습니다."));
+            Category category = categoryRepository.findById(boardDto.getCategoryId()).orElseThrow(()-> new RuntimeException("해당 카테코리가 존재 하지 않습니다."));
             board.setTitle(boardDto.getTitle());
             board.setCategory(category);
             board.setContent(boardDto.getContent());
@@ -37,62 +34,64 @@ public class BoardService {
             board.setMember(member);
             boardRepository.save(board);
             return true;
-        } catch (Exception e) {
+        }catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
+
     // 게시글 전체 조회
     public List<BoardDto> getBoardList() {
         List<Board> boards = boardRepository.findAll();
         List<BoardDto> boardDtos = new ArrayList<>();
-        for(Board board : boards) {
+        for(Board board: boards) {
             boardDtos.add(convertEntityToDto(board));
         }
         return boardDtos;
     }
+
     // 게시글 상세 조회
     public BoardDto getBoardDetail(Long id) {
-        Board board = boardRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("해당 게시글이 존재하지 않습니다.")
-        );
+        Board board = boardRepository.findById(id).orElseThrow(()-> new RuntimeException("해당 게시글이 존재하지 않습니다."));
         return convertEntityToDto(board);
     }
+
     // 게시글 수정
     public boolean modifyBoard(Long id, BoardDto boardDto) {
         try {
-            Board board = boardRepository.findById(id).orElseThrow(
-                    () -> new RuntimeException("해당 게시글이 존재하지 않습니다.")
-            );
+            Board board = boardRepository.findById(id).orElseThrow(()-> new RuntimeException("해당 게시글이 존재하지 않습니다."));
             board.setTitle(boardDto.getTitle());
             board.setContent(boardDto.getContent());
             board.setImgPath(boardDto.getImg());
             boardRepository.save(board);
             return true;
-        } catch (Exception e) {
+        }catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
+
     // 게시글 삭제
     public boolean deleteBoard(Long id) {
         try {
             boardRepository.deleteById(id);
             return true;
-        } catch (Exception e) {
+        }catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
+
     // 게시글 검색
-    public List<BoardDto> searchBoard(String keyword) {
+    public List<BoardDto> searchBoard(String keyword){
         List<Board> boards = boardRepository.findByTitleContaining(keyword);
         List<BoardDto> boardDtos = new ArrayList<>();
-        for(Board board : boards) {
+        for(Board board: boards) {
             boardDtos.add(convertEntityToDto(board));
         }
         return boardDtos;
     }
+
     // 게시글 페이징
     public List<BoardDto> getBoardList(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -103,15 +102,12 @@ public class BoardService {
         }
         return boardDtos;
     }
-    // 회원 이메일로 게시글 조회
-    public List<BoardDto> getBoardListByEmail(String email) {
-        List<Board> boards = boardRepository.findByMemberEmail(email);
-        List<BoardDto> boardDtos = new ArrayList<>();
-        for(Board board : boards) {
-            boardDtos.add(convertEntityToDto(board));
-        }
-        return boardDtos;
+
+    // 페이지 수 조회
+    public int getboards(Pageable pageable) {
+        return boardRepository.findAll(pageable).getTotalPages();
     }
+
 
     // 게시글 엔티티를 DTO로 변환
     private BoardDto convertEntityToDto(Board board) {
@@ -124,10 +120,5 @@ public class BoardService {
         boardDto.setEmail(board.getMember().getEmail());
         boardDto.setRegDate(board.getRegDate());
         return boardDto;
-    }
-
-    // 페이지 수 조회
-    public int getBoards(Pageable pageable) {
-        return boardRepository.findAll(pageable).getTotalPages();
     }
 }

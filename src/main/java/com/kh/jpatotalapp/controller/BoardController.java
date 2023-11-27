@@ -18,51 +18,43 @@ import static com.kh.jpatotalapp.utils.Common.CORS_ORIGIN;
 @RequestMapping("/api/board")
 @RequiredArgsConstructor
 public class BoardController {
-    private final BoardService boardService;
-
-    // 게시글 등록
+    public final BoardService boardService;
+    //게시글 등록
     @PostMapping("/new")
     public ResponseEntity<Boolean> boardRegister(@RequestBody BoardDto boardDto) {
         boolean isTrue = boardService.saveBoard(boardDto);
         return ResponseEntity.ok(isTrue);
     }
-
     // 게시글 수정
     @PutMapping("/modify/{id}")
     public ResponseEntity<Boolean> boardModify(@PathVariable Long id, @RequestBody BoardDto boardDto) {
         boolean isTrue = boardService.modifyBoard(id, boardDto);
         return ResponseEntity.ok(isTrue);
     }
-
     // 게시글 삭제
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Boolean> boardDelete(@PathVariable Long id) {
+    public ResponseEntity<Boolean> boardDelete(@PathVariable Long id){
         boolean isTrue = boardService.deleteBoard(id);
         return ResponseEntity.ok(isTrue);
     }
-
     // 게시글 목록 조회
     @GetMapping("/list")
     public ResponseEntity<List<BoardDto>> boardList() {
         List<BoardDto> list = boardService.getBoardList();
         return ResponseEntity.ok(list);
     }
-
     // 게시글 목록 페이징
     @GetMapping("/list/page")
-    public ResponseEntity<List<BoardDto>> boardList(@RequestParam(defaultValue = "0") int page,
-                                                    @RequestParam(defaultValue = "20") int size) {
+    public ResponseEntity<List<BoardDto>> boardList(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
         List<BoardDto> list = boardService.getBoardList(page, size);
         return ResponseEntity.ok(list);
     }
-
     // 게시글 상세 조회
     @GetMapping("/detail/{id}")
-    public ResponseEntity<BoardDto> boardDetail(@PathVariable Long id) {
+    public ResponseEntity<BoardDto> boardDetail(@PathVariable Long id){
         BoardDto boardDto = boardService.getBoardDetail(id);
         return ResponseEntity.ok(boardDto);
     }
-
     // 게시글 검색
     @GetMapping("/search")
     public ResponseEntity<List<BoardDto>> boardSearch(@RequestParam String keyword) {
@@ -72,18 +64,9 @@ public class BoardController {
 
     // 페이지 수 조회
     @GetMapping("/count")
-    public ResponseEntity<Integer> listBoards(@RequestParam(defaultValue = "0") int page,
-                                              @RequestParam(defaultValue = "10") int size) {
-        PageRequest pageRequest = PageRequest.of(page, size);
-        Integer pageCnt = boardService.getBoards(pageRequest);
+    public ResponseEntity<Integer> listBoards(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size){
+        PageRequest pageRequest = PageRequest.of(page,size);
+        Integer pageCnt = boardService.getboards(pageRequest);
         return ResponseEntity.ok(pageCnt);
     }
-
-    // 회원 이메일로 게시글 조회
-    @GetMapping("/list/email")
-    public ResponseEntity<List<BoardDto>> boardListByEmail(@RequestParam String email) {
-        List<BoardDto> list = boardService.getBoardListByEmail(email);
-        return ResponseEntity.ok(list);
-    }
-
 }
