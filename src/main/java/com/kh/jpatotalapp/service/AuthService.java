@@ -4,7 +4,6 @@ import com.kh.jpatotalapp.dto.MemberReqDto;
 import com.kh.jpatotalapp.dto.MemberResDto;
 import com.kh.jpatotalapp.dto.TokenDto;
 import com.kh.jpatotalapp.entity.Member;
-
 import com.kh.jpatotalapp.jwt.TokenProvider;
 import com.kh.jpatotalapp.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +34,7 @@ public class AuthService {
     }
 
     public TokenDto login(MemberReqDto requestDto) {
-        try {
+//        try {
             UsernamePasswordAuthenticationToken authenticationToken = requestDto.toAuthentication();
             log.info("authenticationToken: {}", authenticationToken);
 
@@ -43,11 +42,11 @@ public class AuthService {
             log.info("authentication: {}", authentication);
 
             return tokenProvider.generateTokenDto(authentication);
-        } catch (Exception e) {
-            log.error("Login error: ", e);
-            throw e;
+//        } catch (Exception e) {
+//            log.error("Login error: ", e);
+//            throw e;
+////        }
 //        }
-        }
 
 
     }
