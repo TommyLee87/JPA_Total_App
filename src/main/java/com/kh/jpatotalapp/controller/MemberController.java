@@ -1,6 +1,7 @@
 package com.kh.jpatotalapp.controller;
 
 import com.kh.jpatotalapp.dto.MemberResDto;
+import com.kh.jpatotalapp.security.SecurityUtil;
 import com.kh.jpatotalapp.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +14,7 @@ import java.util.List;
 import static com.kh.jpatotalapp.utils.Common.CORS_ORIGIN;
 
 @Slf4j
-@CrossOrigin(origins = CORS_ORIGIN)
+//@CrossOrigin(origins = CORS_ORIGIN)
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -39,9 +40,10 @@ public class MemberController {
         return ResponseEntity.ok(list);
     }
     // 회원 상세 조회
-    @GetMapping("/detail/{email}")
-    public ResponseEntity<MemberResDto> memberDetail(@PathVariable String email) {
-        MemberResDto memberDto = memberService.getMemberDetail(email);
+    @GetMapping("/detail")
+    public ResponseEntity<MemberResDto> memberDetail() {
+        Long id = SecurityUtil.getCurrentMemberId();
+        MemberResDto memberDto = memberService.getMemberDetail(id);
         return ResponseEntity.ok(memberDto);
     }
     //회원 수정
@@ -50,13 +52,6 @@ public class MemberController {
         log.info("memberDto : {}", memberDto.getEmail());
         boolean isTrue = memberService.modifyMember(memberDto);
         return ResponseEntity.ok(isTrue);
-    }
-    // 회원 존재 여부 확인
-    @GetMapping("/check")
-    public ResponseEntity<Boolean> isMember(@RequestParam String email) {
-        log.info("email : {}", email);
-        boolean isReg = memberService.isMember(email);
-        return ResponseEntity.ok(!isReg);
     }
 
     //회원 삭제

@@ -14,21 +14,5 @@ public class SecurityUtil {
         }
         return Long.parseLong(authentication.getName());
     }
-    // Security Context의 Authentication 객체를 이용해 회원의 이메일을 가져온다.
-    public static String getCurrentMemberEmail() {
-        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || authentication.getName() == null) {
-            throw new RuntimeException("Security Context에 인증 정보가 없습니다.");
-        }
-        return authentication.getName();
-    }
-    // Security Context의 Authentication 객체를 이용해 회원의 이름을 가져온다.
-    public static String getCurrentMemberName() {
-        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || authentication.getName() == null) {
-            throw new RuntimeException("Security Context에 인증 정보가 없습니다.");
-        }
-        return authentication.getPrincipal().toString();
-    }
 
 }

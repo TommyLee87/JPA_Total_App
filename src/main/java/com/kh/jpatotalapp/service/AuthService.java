@@ -25,6 +25,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
 
+    // 회원가입
     public MemberResDto signup(MemberReqDto requestDto) {
         if (memberRepository.existsByEmail(requestDto.getEmail())) {
             throw new RuntimeException("이미 가입되어 있는 유저입니다");
@@ -32,9 +33,9 @@ public class AuthService {
         Member member = requestDto.toEntity(passwordEncoder);
         return MemberResDto.of(memberRepository.save(member));
     }
-
+    // 로그인
     public TokenDto login(MemberReqDto requestDto) {
-//        try {
+
             UsernamePasswordAuthenticationToken authenticationToken = requestDto.toAuthentication();
             log.info("authenticationToken: {}", authenticationToken);
 
@@ -42,12 +43,6 @@ public class AuthService {
             log.info("authentication: {}", authentication);
 
             return tokenProvider.generateTokenDto(authentication);
-//        } catch (Exception e) {
-//            log.error("Login error: ", e);
-//            throw e;
-////        }
-//        }
-
 
     }
 }

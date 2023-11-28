@@ -28,7 +28,6 @@ public class AuthController {
     public ResponseEntity<TokenDto> login(@RequestBody MemberReqDto requestDto) {
         return ResponseEntity.ok(authService.login(requestDto));
 
-
     }
     // 회원 존재 여부 확인
     @GetMapping("/exists/{email}")
