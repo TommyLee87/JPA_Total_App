@@ -23,6 +23,7 @@ public class AuthController {
     public ResponseEntity<MemberResDto> signup(@RequestBody MemberReqDto requestDto) {
         return ResponseEntity.ok(authService.signup(requestDto));
     }
+
     // 회원 로그인
     @PostMapping("/login")
     public ResponseEntity<TokenDto> login(@RequestBody MemberReqDto requestDto) {
@@ -36,4 +37,12 @@ public class AuthController {
         boolean isTrue = memberService.isMember(email);
         return ResponseEntity.ok(!isTrue);
     }
+
+    // accessToken 재발급
+    @PostMapping("/refresh")
+    public ResponseEntity<String> refreshToken(@RequestBody String refreshToken) {
+        log.info("refreshToken: {}", refreshToken);
+        return ResponseEntity.ok(authService.createAccessToken(refreshToken));
+    }
+
 }

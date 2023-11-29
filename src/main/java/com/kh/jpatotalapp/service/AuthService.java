@@ -33,16 +33,23 @@ public class AuthService {
         Member member = requestDto.toEntity(passwordEncoder);
         return MemberResDto.of(memberRepository.save(member));
     }
+
     // 로그인
     public TokenDto login(MemberReqDto requestDto) {
 
-            UsernamePasswordAuthenticationToken authenticationToken = requestDto.toAuthentication();
-            log.info("authenticationToken: {}", authenticationToken);
+        UsernamePasswordAuthenticationToken authenticationToken = requestDto.toAuthentication();
+        log.info("authenticationToken: {}", authenticationToken);
 
-            Authentication authentication = managerBuilder.getObject().authenticate(authenticationToken);
-            log.info("authentication: {}", authentication);
+        Authentication authentication = managerBuilder.getObject().authenticate(authenticationToken);
+        log.info("authentication: {}", authentication);
 
-            return tokenProvider.generateTokenDto(authentication);
+        return tokenProvider.generateTokenDto(authentication);
+    }
+
+    // accessToken 재발급
+    public String createAccessToken(String refreshToken) {
+        Authentication authentication = tokenProvider.getAuthentication(refreshToken);
+        return tokenProvider.generateAccessToken(authentication);
 
     }
 }

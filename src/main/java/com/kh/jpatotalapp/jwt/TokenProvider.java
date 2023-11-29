@@ -23,11 +23,13 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
+
 // 토큰 생성, 토큰 검증, 토큰에서 회원 정보 추출
 public class TokenProvider {
     private static final String AUTHORITIES_KEY = "auth"; // 토큰에 저장되는 권한 정보의 key
     private static final String BEARER_TYPE = "Bearer"; // 토큰의 타입
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24L; // 24시간
+//    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24L; // 24시간
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 10L; // 10분(test only)
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7L; // 7일
     private final Key key; // 토큰을 서명하기 위한 Key
 
@@ -38,6 +40,7 @@ public class TokenProvider {
 
     // 토큰 생성
     public TokenDto generateTokenDto(Authentication authentication) {
+
         // 권한 정보 문자열 생성,
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -71,6 +74,8 @@ public class TokenProvider {
                 .refreshTokenExpiresIn(refreshTokenExpiresIn.getTime())
                 .build();
     }
+
+    // 토큰에서 회원 정보 추출
     public Authentication getAuthentication(String accessToken) {
         // 토큰 복호화
         Claims claims = parseClaims(accessToken);
@@ -92,6 +97,7 @@ public class TokenProvider {
         // 유저 객체, 토큰, 권한 정보들을 이용해 인증 객체를 생성해서 반환
         return new UsernamePasswordAuthenticationToken(principal, accessToken, authorities);
     }
+
     // 토큰의 유효성 검증
     public boolean validateToken(String token) {
         try {
@@ -108,6 +114,7 @@ public class TokenProvider {
         }
         return false;
     }
+
     // 토큰 복호화
     private Claims parseClaims(String accessToken) {
         try {
@@ -115,5 +122,10 @@ public class TokenProvider {
         } catch (ExpiredJwtException e) {
             return e.getClaims();
         }
+    }
+
+    // accessToken 재발급
+    public String generateAccessToken(Authentication authentication) {
+        return generateTokenDto(authentication).getAccessToken();
     }
 }

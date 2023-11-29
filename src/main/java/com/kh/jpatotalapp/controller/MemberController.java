@@ -20,12 +20,14 @@ import static com.kh.jpatotalapp.utils.Common.CORS_ORIGIN;
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
+
     //회원 전체 조회
     @GetMapping("/list")
     public ResponseEntity<List<MemberResDto>> memberList() {
         List<MemberResDto> list = memberService.getMemberList();
         return ResponseEntity.ok(list);
     }
+
     //총 페이지 수
     @GetMapping("/list/count")
     public ResponseEntity<Integer> memberCount(@RequestParam(defaultValue = "20") int page, @RequestParam(defaultValue = "0") int size){
@@ -33,12 +35,14 @@ public class MemberController {
         int pageCnt = memberService.getMemberPage(pageRequest);
         return ResponseEntity.ok(pageCnt);
     }
+
     // 회원 조회 페이지네이션
     @GetMapping("/list/page")
     public ResponseEntity<List<MemberResDto>> memberList(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size){
         List<MemberResDto> list = memberService.getMemberList(page,size);
         return ResponseEntity.ok(list);
     }
+
     // 회원 상세 조회
     @GetMapping("/detail")
     public ResponseEntity<MemberResDto> memberDetail() {
@@ -46,6 +50,7 @@ public class MemberController {
         MemberResDto memberDto = memberService.getMemberDetail(id);
         return ResponseEntity.ok(memberDto);
     }
+
     //회원 수정
     @PutMapping("/modify")
     public ResponseEntity<Boolean> memberModify(@RequestBody MemberResDto memberDto) {

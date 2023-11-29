@@ -31,16 +31,6 @@ public class MemberService {
         return convertEntityToDto(member);
     }
 
-    // 회원 가입
-//    public boolean saveMember(MemberReqDto memberDto) {
-//        Member member = new Member();
-//        member.setEmail(memberDto.getEmail());
-//        member.setName(memberDto.getName());
-//        member.setPassword(memberDto.getPassword());
-//        member.setImage(memberDto.getImage());
-//        memberRepository.save(member);
-//        return true;
-//    }
     // 회원 수정
     public boolean modifyMember(MemberResDto memberDto) {
         try {
@@ -56,22 +46,14 @@ public class MemberService {
         }
     }
 
-    //로그인
-//    public boolean login(String email, String pwd) {
-//        log.info("email: {}, pwd: {}", email, pwd);
-//        Optional<Member> member = memberRepository.findByEmailAndPassword(email, pwd);
-//        log.info("member: {}", member);
-//        return member.isPresent();
-//    }
-
-    // 회원삭제
+    // 회원 삭제
     public boolean deleteMember(String email) {
         try {
             Member member = memberRepository.findByEmail(email).orElseThrow(()-> new RuntimeException("해당 회원이 존재하지 않습니다."));
             memberRepository.delete(member);
-            return true;
+            return true; // 회원이 존재하면 true 반환
         }catch (Exception e) {
-            return false;
+            return false; // 회원이 존재하지 않으면 false 반환
         }
     }
 

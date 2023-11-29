@@ -20,6 +20,7 @@ import static com.kh.jpatotalapp.utils.Common.CORS_ORIGIN;
 @RequiredArgsConstructor
 public class CommentController {
     private final CommentService commentService;
+
     //댓글 등록
     @PostMapping("/new")
     public ResponseEntity<Boolean> commentRegister(@RequestBody CommentDto commentDto) {
@@ -27,18 +28,21 @@ public class CommentController {
         boolean result = commentService.commentRegister(commentDto);
         return ResponseEntity.ok(result);
     }
+
     //댓글 수정
     @PutMapping("/modify")
     public ResponseEntity<Boolean> commentModify(@RequestBody CommentDto commentDto) {
         boolean result = commentService.commentModify(commentDto);
         return ResponseEntity.ok(result);
     }
+
     //댓글 삭제
     @DeleteMapping("/delete/{commentId}")
     public ResponseEntity<Boolean> commentDelete(@PathVariable Long commentId){
         boolean result = commentService.commentDelete(commentId);
         return ResponseEntity.ok(result);
     }
+
     //댓글 목록 조회
     @GetMapping("/list/{boardId}")
     public ResponseEntity<List<CommentDto>> commentList(@PathVariable Long boardId){
@@ -46,6 +50,7 @@ public class CommentController {
         List<CommentDto> list = commentService.getCommentList(boardId);
         return ResponseEntity.ok(list);
     }
+
     // 댓글 목록 페이징
     @GetMapping("/list/page")
     public ResponseEntity<List<CommentDto>> commentList(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size){
