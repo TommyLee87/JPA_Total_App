@@ -33,5 +33,6 @@ public class Chat {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id")
     @JsonIgnore
+//    private Chat chat;
     private ChatRoom chatRoom;
 }

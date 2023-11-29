@@ -3,8 +3,7 @@ package com.kh.jpatotalapp.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
+@Getter @Setter
 public class ChatMessageDto {
     public enum MessageType {
         ENTER, TALK, CLOSE
@@ -14,4 +13,5 @@ public class ChatMessageDto {
     private String sender;
     private String senderName;
     private String message;
+
 }
