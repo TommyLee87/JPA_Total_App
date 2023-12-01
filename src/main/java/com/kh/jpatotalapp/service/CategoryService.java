@@ -6,10 +6,13 @@ import com.kh.jpatotalapp.entity.Member;
 import com.kh.jpatotalapp.repository.CategoryRepository;
 import com.kh.jpatotalapp.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.kh.jpatotalapp.security.SecurityUtil.getCurrentMemberId;
 
 @Service
 @RequiredArgsConstructor
@@ -17,11 +20,12 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final MemberRepository memberRepository;
 
-    //카테고리 등록
+    // 카테고리 등록
     public boolean saveCategory(CategoryDto categoryDto){
         try {
             Category category = new Category();
-            Member member = memberRepository.findByEmail(categoryDto.getEmail()).orElseThrow(()-> new RuntimeException("해당 회원이 존재 하지 않습니다."));
+            Long memberId = getCurrentMemberId();
+            Member member = memberRepository.findById(memberId).orElseThrow(()-> new RuntimeException("해당 회원이 존재 하지 않습니다."));
             category.setCategoryName(categoryDto.getCategoryName());
             category.setMember(member);
             categoryRepository.save(category);
@@ -36,7 +40,8 @@ public class CategoryService {
     public boolean modifyCategory(Long id, CategoryDto categoryDto) {
         try {
             Category category = categoryRepository.findById(id).orElseThrow(()-> new RuntimeException("해당 카테고리가 존재 하지 않습니다."));
-            Member member = memberRepository.findByEmail(categoryDto.getEmail()).orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
+            Long memberId = getCurrentMemberId();
+            Member member = memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
             category.setCategoryName(categoryDto.getCategoryName());
             category.setCategoryId(categoryDto.getCategoryId());
             category.setMember(member);
@@ -48,7 +53,7 @@ public class CategoryService {
         }
     }
 
-    //카테고리 삭제
+    // 카테고리 삭제
     public boolean deleteCategory(Long id) {
         try {
             Category category = categoryRepository.findById(id).orElseThrow(()-> new RuntimeException("해당 카테고리가 존재 하지 않습니다."));
@@ -59,7 +64,7 @@ public class CategoryService {
             return false;
         }
     }
-    //카테고리 목록 조회
+    // 카테고리 목록 조회
     public List<CategoryDto> getCategoryList() {
         List<Category> categories = categoryRepository.findAll();
         List<CategoryDto> categoryDtos = new ArrayList<>();

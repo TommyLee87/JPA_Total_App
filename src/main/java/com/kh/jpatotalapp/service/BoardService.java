@@ -15,17 +15,21 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.kh.jpatotalapp.security.SecurityUtil.getCurrentMemberId;
+
 @Service
 @RequiredArgsConstructor
 public class BoardService {
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
     private final CategoryRepository categoryRepository;
+
     // 게시글 등록
     public boolean saveBoard(BoardDto boardDto) {
         try {
             Board board = new Board();
-            Member member = memberRepository.findByEmail(boardDto.getEmail()).orElseThrow(()-> new RuntimeException("해당 회원이 존재 하지 않습니다."));
+            Long memberId = getCurrentMemberId();
+            Member member = memberRepository.findById(memberId).orElseThrow(()-> new RuntimeException("해당 회원이 존재 하지 않습니다."));
             Category category = categoryRepository.findById(boardDto.getCategoryId()).orElseThrow(()-> new RuntimeException("해당 카테코리가 존재 하지 않습니다."));
             board.setTitle(boardDto.getTitle());
             board.setCategory(category);

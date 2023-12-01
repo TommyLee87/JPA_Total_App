@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.kh.jpatotalapp.security.SecurityUtil.getCurrentMemberId;
+
 @Service
 @RequiredArgsConstructor
 public class CommentService {
@@ -27,7 +29,8 @@ public class CommentService {
         try{
             Comment comment = new Comment();
             Board board = boardRepository.findById(commentDto.getBoardId()).orElseThrow(() -> new RuntimeException("해당 게시글이 존재하지 않습니다."));
-            Member member = memberRepository.findByEmail(commentDto.getEmail()).orElseThrow(()-> new RuntimeException("해당 회원이 존재하지 않습니다."));
+            Long memberId = getCurrentMemberId();
+            Member member = memberRepository.findById(memberId).orElseThrow(()-> new RuntimeException("해당 회원이 존재하지 않습니다."));
             comment.setContent(commentDto.getContent());
             comment.setMember(member);
             comment.setBoard(board);
